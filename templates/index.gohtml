@@ -1,0 +1,261 @@
+{{ define "copyable" }}
+<span class="copyable" data-value="{{ . }}">
+  <code>{{ . }}</code>
+
+  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"><path fill="currentColor" d="M9 18q-.825 0-1.412-.587T7 16V4q0-.825.588-1.412T9 2h9q.825 0 1.413.588T20 4v12q0 .825-.587 1.413T18 18H9Zm-4 4q-.825 0-1.412-.587T3 20V6h2v14h11v2H5Z"/></svg>
+</span>
+{{ end }}
+
+{{ define "group" }}
+<div class="group">
+  <h2>{{ .Name }} {{with .Deprecated}}<span class="deprecated">(Deprecated)</span>{{end}}</h2>
+  {{ with .Description }}<span>{{ . }}</span>{{ end }}
+
+  {{ range .Certificates }}
+  {{ template "certificate" . }}
+  {{ end }}
+</div>
+{{ end }}
+
+{{ define "certificate" }}
+<div class="certificate">
+  <h3>{{ .Name }} {{ with .Deprecated }}<span class="deprecated">(Deprecated)</span>{{ end }}</h3>
+
+  <a href="{{ .File }}" download draggable="false">
+    <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24"><path fill="currentColor" d="M13 13.15V10q0-.425-.288-.712T12 9q-.425 0-.712.288T11 10v3.15l-.9-.875Q9.825 12 9.413 12t-.713.3q-.275.275-.275.7t.275.7l2.6 2.6q.3.3.7.3t.7-.3l2.6-2.6q.275-.275.287-.687T15.3 12.3q-.275-.275-.687-.288t-.713.263l-.9.875ZM6 22q-.825 0-1.412-.587T4 20V8.825q0-.4.15-.762t.425-.638l4.85-4.85q.275-.275.638-.425t.762-.15H18q.825 0 1.413.588T20 4v16q0 .825-.587 1.413T18 22H6Z"/></svg>
+  </a>
+
+  {{ with .Description }}<span>{{ . }}</span>{{ end }}
+
+  <div class="chips">
+    <div class="chip">
+      <span>
+        <span>Expiry</span>
+      </span>
+      <span
+        class="local-date-time"
+        data-timestamp="{{ .ExpiryTimestamp }}"
+        >{{ .Expiry }}</span
+      >
+    </div>
+
+    <div class="chip">
+      <span>
+        <span>SHA256</span>
+      </span>
+      {{ template "copyable" .SHA256 }}
+    </div>
+
+    <div class="chip">
+      <span>
+        <span>SHA1</span>
+      </span>
+      {{ template "copyable" .SHA1 }}
+    </div>
+
+    <div class="chip">
+      <span>
+        <span>MD5</span>
+      </span>
+      {{ template "copyable" .MD5 }}
+    </div>
+  </div>
+</div>
+{{ end }}
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Certificates</title>
+
+    <style>
+      @font-face {
+        font-family: "Monaspace Neon";
+        src: url(/MonaspaceNeon-Light.woff) format("woff"),
+          url(/MonaspaceNeon-Light.otf) format("opentype");
+        font-weight: 300;
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        gap: 0;
+        outline: 0;
+        border: 0;
+        box-sizing: border-box;
+      }
+
+      :root {
+        font-size: 16px;
+        --info: #888888;
+      }
+
+      html {
+        background-color: black;
+        color: white;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+
+        margin: 2rem;
+      }
+
+      body {
+        max-width: 840px;
+        margin: 0 auto;
+        -webkit-user-drag: none;
+      }
+
+      code {
+        font-family: "Monaspace Neon", "Courier New", Courier, monospace;
+        line-height: 1;
+        font-size: 13px;
+      }
+
+      span:has(code) {
+        display: flex;
+        align-items: center;
+      }
+
+      .container, .group {
+        margin-top: 1rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+
+      .certificate {
+        padding: 0.75rem 1rem 1rem 1rem;
+
+        position: relative;
+
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+
+        color: #eee;
+        text-decoration: none;
+
+        border: #272727 1px solid;
+        border-radius: 0.375rem;
+
+        transition: border 0.2s ease-in-out;
+      }
+
+      .certificate > a {
+        position: absolute;
+        right: 0.625rem;
+        top: 0.75rem;
+        color: var(--info);
+        transition: color 0.2s ease-in-out;
+      }
+      .certificate > a:hover {
+        color: #fff;
+      }
+      .certificate:has(a:hover) {
+        border: #fff 1px solid;
+      }
+
+      .certificate > h3 {
+        color: #fff;
+
+        font-size: 1.25rem;
+        font-weight: bold;
+      }
+
+      .chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.25rem;
+      }
+
+      .chip {
+        display: inline-flex;
+        align-items: center;
+        color: #eee;
+        max-width: 100%;
+        overflow: hidden;
+        overflow-wrap: anywhere;
+        pointer-events: stroke;
+      }
+
+      .chip > * {
+        align-self: stretch;
+        display: flex;
+
+        padding: 0.25rem 0.5rem;
+      }
+
+      .chip > :first-child {
+        min-width: fit-content;
+        background-color: #353535;
+        border-radius: 0.25rem 0 0 0.25rem;
+        user-select: none;
+      }
+
+      .chip > :first-child > * {
+        margin: auto;
+        line-height: 1;
+      }
+
+      .chip > :last-child {
+        line-height: 1;
+
+        background-color: #222222;
+        border-radius: 0 0.25rem 0.25rem 0;
+      }
+
+      .deprecated {
+        font-size: 14px;
+        color: var(--info);
+      }
+
+      .copyable {
+        padding: 0.25rem 0.25rem 0.25rem 0.5rem;
+      }
+      .copyable > svg {
+        cursor: pointer;
+        transition: color 0.2s ease-in-out;
+        color: var(--info);
+        margin-left: .25rem;
+      }
+      .copyable > svg:hover {
+        color: #fff;
+      }
+    </style>
+  </head>
+
+  <body>
+    <h1>Certificates</h1>
+
+    <div class="container">
+      {{ range . }}
+      {{ template "group" . }}
+      {{ end }}
+    </div>
+
+    <script>
+      (() => {
+        const els = document.querySelectorAll(".local-date-time");
+        for (const el of els) {
+          try {
+            el.innerText = new Date(
+              +el.dataset.timestamp * 1000
+            ).toLocaleDateString();
+          } catch {}
+        }
+      })();
+
+      (() => {
+        const els = document.querySelectorAll(".copyable");
+        for (const el of els) {
+          el.onclick = (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            navigator.clipboard.writeText(el.dataset.value);
+          }
+        }
+      })();
+    </script>
+  </body>
+</html>
