@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"hash"
 	"io"
+	"strings"
 
 	"html/template"
 	"os"
@@ -27,8 +28,10 @@ import (
 var IndexTemplate string
 
 type Certificate struct {
-	Name        string  `yaml:"name"`
-	Path        string  `yaml:"path"`
+	Name string `yaml:"name"`
+	Path string `yaml:"path"`
+	/// FileName is the filename that this file will be downloaded as
+	FileName    *string `yaml:"filename"`
 	Description *string `yaml:"description"`
 	Deprecated  bool    `yaml:"deprecated"`
 }
@@ -233,7 +236,9 @@ func processCertificate(spec Certificate, groupName, output string) (*Certificat
 	}
 	log.Debug().Msg("created folder structure")
 
-	if err := copyFile(f, filepath.Join(output, spec.Name+".crt")); err != nil {
+	fileName := getFileName(spec) + ".crt"
+
+	if err := copyFile(f, filepath.Join(output, fileName)); err != nil {
 		return nil, errors.Wrap(err, "copying certificate file")
 	}
 	log.Trace().Msg("copied certificate file")
@@ -242,11 +247,19 @@ func processCertificate(spec Certificate, groupName, output string) (*Certificat
 		Name:            spec.Name,
 		Description:     spec.Description,
 		Deprecated:      spec.Deprecated,
-		File:            filepath.Join("/certificates/", groupName, spec.Name+".crt"),
+		File:            filepath.Join("/certificates/", groupName, fileName),
 		Expiry:          expiry,
 		ExpiryTimestamp: expiryTimestamp,
 		SHA256:          sha256,
 		SHA1:            sha1,
 		MD5:             md5,
 	}, nil
+}
+
+func getFileName(cert Certificate) string {
+	if cert.FileName != nil {
+		return *cert.FileName
+	}
+
+	return strings.ReplaceAll(strings.ReplaceAll(cert.Name, " ", "_"), ".", "_")
 }

@@ -13,13 +13,20 @@ The application expects a `config.yml` file in `/config.yml` of which the schema
 ---
 groups:
   - name: Group 1
-    description: Description of group 1 # This is optional
-    deprecated: false # This is optional and defaults to `false`
+    # Show a description under the group heading (optional)
+    description: Description of group 1
+    # Show a label next the group (optional, defaults to `false`)
+    deprecated: false
     certificates:
       - name: Certificates 1
-        path: /certificates/cert1.crt # Any PEM encoded public key is valid here
-        description: Description of group 1 # This is optional
-        deprecated: false # This is optional and defaults to `false`
+        # Any PEM encoded public key is valid here
+        path: /certificates/cert1.crt
+        # Show a description under the certificate heading (optional)
+        description: Description of group 1
+        # Set a different file name that users will see when they download the file (optional, defaults to certificate name with all spaces replaced to underscores)
+        filename: cert_1
+        # Show a label next the certificate (optional, defaults to `false`)
+        deprecated: false
 ```
 
 List the certificates in the order they should be shown:
