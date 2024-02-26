@@ -8,7 +8,7 @@ COPY . .
 RUN CGO_ENABLED=0 GOOS=linux go build -o /build/app
 
 
-FROM ghcr.io/thedevminertv/gostatic:1.3.1
+FROM ghcr.io/thedevminertv/gostatic:1.3.2
 
 COPY --from=builder /build/app /usr/local/bin/build-html
 COPY --chown=app:app ./entrypoint.sh /
